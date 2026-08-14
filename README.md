@@ -1,51 +1,65 @@
-# ContextForge
+# ContextOS
 
-ContextForge is a tiny offline-first developer utility for beginners who want clearer, more token-efficient prompts for coding-capable LLMs.
+ContextOS is a small, offline-first web application that helps developers prepare an existing software project for an external AI coding workflow.
 
-It does not call an LLM, GitHub, an API, or a backend. The application generates prompts entirely in your browser and stores optional state in `localStorage`.
+It is intentionally **not** a repository analyzer. It does not contact GitHub, call an LLM, upload files, require an account, or use a backend.
 
-## Workflow
+## What it does
 
-1. Enter the coding task.
-2. Answer a few plain-language project questions.
-3. Optionally use the discovery workflow to have your external coding LLM inspect the project first.
-4. ContextForge builds a structured implementation prompt locally.
-5. Copy the prompt and paste it into your preferred coding assistant.
+### Prepare my project
 
-## Run offline
+Enter a GitHub repository URL and a little context about the project. ContextOS generates a bootstrap prompt that instructs ChatGPT to inspect the repository and create:
 
-Open `index.html` in your browser.
+- `AGENTS.md`
+- `SPEC.md`
+- `PLAN.md`
+- `PROGRESS.md`
+- `DECISIONS.md`
+- `LESSONS.md`
 
-No server, package manager, build step, CDN, external font, or network connection is required.
+The prompt explicitly preserves the existing repository structure and asks the external AI not to modify application code while creating the project context layer.
 
-## Discovery workflow
+### Prepare a coding task
 
-Choose “Help me inspect the project” to generate a read-only discovery prompt. Copy it into your external coding LLM, ask it to inspect the project without making changes, then paste its analysis back into ContextForge. The pasted response is treated as plain project context; V1 does not attempt to parse it.
+Create a focused implementation prompt with:
 
-## Local storage
+- repository reference
+- task
+- project type
+- known context or an offline-generated discovery prompt
+- relevant files
+- acceptance criteria
+- additional instructions
+- Fast, Careful, or Thorough workflow presets
+- optional advanced controls
 
-ContextForge saves current form state, workflow selections, recent tasks/settings, and recent generated prompts in your browser using `localStorage`. Stored data is never uploaded. Use **Clear saved data** to remove ContextForge's saved state and history.
+If the user does not understand the project yet, ContextOS generates a discovery prompt. The user can paste the external AI's analysis back into ContextOS before generating the final coding prompt.
 
-## Privacy
+## Offline and private
 
-Everything stays in your browser. ContextForge does not send your project information anywhere.
+All functionality runs in the browser:
 
-## Project structure
+- no network requests
+- no GitHub API
+- no OpenAI or LLM API
+- no telemetry or analytics
+- no accounts or backend
+- local persistence with `localStorage`
+
+## Run
+
+No installation or build process is required. Open `index.html` directly from disk.
+
+## Files
 
 ```text
-contextforge/
+ContextOS/
 ├── index.html
 ├── style.css
 ├── app.js
 └── README.md
 ```
 
-## Customize the prompts
+## Manual checks
 
-Prompt wording is intentionally local and readable. Edit the template strings in `app.js` to change discovery or implementation prompt sections.
-
-## Product boundary
-
-This MVP does not scan or clone repositories, contact GitHub, call an LLM, run agent integrations, use a backend, create accounts, or collect analytics. It is deliberately just:
-
-`FORM → PROMPT GENERATOR → COPY → USER PASTES INTO LLM`
+Open `index.html` directly and verify project preparation, coding-task generation, discovery analysis, prompt copying, Fast/Careful/Thorough presets, advanced options, persistence, clearing saved data, and mobile layout.

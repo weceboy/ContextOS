@@ -1,105 +1,23 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="ContextForge creates clear, token-efficient coding prompts entirely in your browser.">
-  <title>ContextForge</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="shell">
-    <header class="hero">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span> ContextForge</div>
-      <h1>Create a better coding prompt.</h1>
-      <p>Answer a few simple questions, then copy a structured prompt into your preferred coding assistant.</p>
-      <p class="privacy">Everything stays in your browser. ContextForge does not send your project information anywhere.</p>
-    </header>
-
-    <section id="formView" class="card" aria-labelledby="form-title">
-      <div class="section-heading"><span class="step">01</span><div><h2 id="form-title">Project & task</h2><p>Start with the thing you want the coding assistant to accomplish.</p></div></div>
-      <div class="field">
-        <label for="repo">GitHub repository <span class="optional">Optional</span></label>
-        <input id="repo" type="url" inputmode="url" placeholder="https://github.com/user/project" autocomplete="url">
-        <p class="help">Reference only. ContextForge never contacts GitHub.</p>
-        <p id="repoError" class="error" role="alert" hidden>Enter a valid-looking GitHub URL, for example https://github.com/user/project.</p>
-      </div>
-      <div class="field">
-        <label for="task">What do you want to do? <span class="required">Required</span></label>
-        <textarea id="task" rows="5" placeholder="Example: Add password reset functionality to the existing application."></textarea>
-        <p id="taskError" class="error" role="alert" hidden>Please describe the task before generating a prompt.</p>
-      </div>
-      <div class="field">
-        <label for="projectType">What kind of project is this? <span class="optional">Optional</span></label>
-        <select id="projectType"><option value="">Select a project type</option><option>Web application</option><option>Backend / API</option><option>Mobile application</option><option>CLI application</option><option>Desktop application</option><option>Library / package</option><option>Data / automation</option><option>Other</option></select>
-      </div>
-    </section>
-
-    <section id="contextSection" class="card" aria-labelledby="context-title">
-      <div class="section-heading"><span class="step">02</span><div><h2 id="context-title">Existing project context</h2><p>Tell the assistant what you already know, or let it help you inspect the project.</p></div></div>
-      <fieldset class="choice-group">
-        <legend>What already exists?</legend>
-        <label class="choice"><input type="radio" name="contextMode" value="known" checked><span><strong>I know</strong><small>I can describe the relevant existing functionality.</small></span></label>
-        <label class="choice"><input type="radio" name="contextMode" value="discover"><span><strong>Help me inspect the project</strong><small>Generate a safe discovery prompt to run in your external coding LLM.</small></span></label>
-      </fieldset>
-      <div id="knownContext" class="field conditional">
-        <label for="existingContext">Describe what already exists <span class="optional">Optional</span></label>
-        <textarea id="existingContext" rows="4" placeholder="User registration and login already work. Users are stored in PostgreSQL."></textarea>
-      </div>
-      <div id="discoveryPanel" class="discovery conditional" hidden>
-        <div class="discovery-intro"><span class="icon" aria-hidden="true">⌕</span><div><h3>Let’s understand the project first</h3><p>You don’t need to understand the codebase yourself. Copy the prompt below into your coding LLM, ask it to inspect the project without making changes, then paste its analysis back here.</p></div></div>
-        <label for="discoveryPrompt">Discovery prompt</label>
-        <textarea id="discoveryPrompt" class="code-area" rows="18" readonly></textarea>
-        <div class="actions"><button id="copyDiscovery" class="secondary">Copy discovery prompt</button><button id="backDiscovery" class="ghost">Back</button></div>
-        <div class="field paste-area">
-          <label for="discoveryAnalysis">Paste the project analysis here <span class="optional">Editable</span></label>
-          <textarea id="discoveryAnalysis" rows="9" placeholder="Paste the analysis from your coding assistant here."></textarea>
-          <button id="continueDiscovery" class="primary small">Continue</button>
-          <p id="discoveryConfirmation" class="success" role="status" hidden>Project analysis added ✓</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="filesSection" class="card" aria-labelledby="files-title">
-      <div class="section-heading"><span class="step">03</span><div><h2 id="files-title">Relevant files</h2><p>Give the assistant a starting point, or let it find the smallest useful set.</p></div></div>
-      <fieldset class="choice-group inline">
-        <legend>Do you know which files are relevant?</legend>
-        <label class="choice"><input type="radio" name="filesMode" value="yes"><span><strong>Yes</strong></span></label>
-        <label class="choice"><input type="radio" name="filesMode" value="no" checked><span><strong>No</strong></span></label>
-      </fieldset>
-      <div id="filesInputWrap" class="field conditional" hidden>
-        <label for="relevantFiles">Relevant files</label>
-        <textarea id="relevantFiles" rows="5" placeholder="src/auth/login.ts\nsrc/auth/user.ts\ntests/auth/login.test.ts"></textarea>
-      </div>
-    </section>
-
-    <section id="workflowSection" class="card" aria-labelledby="workflow-title">
-      <div class="section-heading"><span class="step">04</span><div><h2 id="workflow-title">How should the coding assistant work?</h2><p>Choose the habits you want included in the implementation workflow.</p></div></div>
-      <div id="workflowOptions" class="checks"></div>
-    </section>
-
-    <section id="criteriaSection" class="card" aria-labelledby="criteria-title">
-      <div class="section-heading"><span class="step">05</span><div><h2 id="criteria-title">Definition of done</h2><p>Clear acceptance criteria help the assistant know when to stop.</p></div></div>
-      <div class="field"><label for="criteria">What does “done” mean? <span class="optional">Optional</span></label><textarea id="criteria" rows="5" placeholder="Password reset can be requested.&#10;Expired reset links are rejected.&#10;Existing authentication continues to work.&#10;Tests pass."></textarea></div>
-      <div class="field"><label for="additional">Anything else the coding assistant should know? <span class="optional">Optional</span></label><textarea id="additional" rows="4" placeholder="Any constraints, preferences, or important details."></textarea></div>
-    </section>
-
-    <div class="generate-wrap"><button id="generate" class="primary generate">Generate implementation prompt <span aria-hidden="true">→</span></button></div>
-    <div class="storage-row"><button id="clearData" class="text-button">Clear saved data</button><span id="saveStatus" aria-live="polite">Saved locally</span></div>
-  </main>
-
-  <section id="resultView" class="result-shell" hidden aria-labelledby="result-title">
-    <div class="result-card">
-      <div class="result-head"><div><span class="eyebrow">READY</span><h2 id="result-title">Your prompt is ready ✓</h2><p id="sizeLabel">Approximate token count</p></div><button id="closeResult" class="ghost">Edit form</button></div>
-      <div class="size-meter"><span id="sizeBar"></span></div>
-      <label for="generatedPrompt">Generated implementation prompt</label>
-      <textarea id="generatedPrompt" class="code-area result-area" rows="30"></textarea>
-      <div class="actions result-actions"><button id="copyPrompt" class="primary">Copy prompt</button><button id="editForm" class="secondary">Edit form</button><button id="startOver" class="ghost">Start over</button></div>
-      <p id="copyStatus" class="success" role="status" hidden>Copied ✓</p>
-    </div>
-  </section>
-
-  <footer><span>ContextForge · offline-first</span><span>No API keys · No tracking · No network requests</span></footer>
-  <script src="app.js"></script>
-</body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="ContextOS prepares projects and coding tasks for external AI coding workflows, entirely offline."><title>ContextOS</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="shell">
+<header class="hero"><div class="brand"><span class="brand-mark">⌘</span> ContextOS</div><h1>Prepare your project for AI coding.</h1><p>ContextOS creates clear prompts and project context instructions. It does not inspect your repository or send your information anywhere.</p><p class="privacy">Everything stays in your browser. No API keys · No tracking · No network requests.</p></header>
+<nav class="mode-nav" aria-label="Workflow"><button class="mode-btn active" data-mode="project">Prepare my project</button><button class="mode-btn" data-mode="task">Prepare a coding task</button></nav>
+<section id="projectView" class="card"><div class="section-heading"><span class="step">01</span><div><h2>Prepare an existing project</h2><p>Give ChatGPT the context it needs to create useful project-memory files.</p></div></div>
+<div class="field"><label for="projectRepo">GitHub repository <span class="required">Required</span></label><input id="projectRepo" type="url" placeholder="https://github.com/user/project"><p class="help">Paste the repository you want ChatGPT to analyze. ContextOS only validates this locally.</p><p id="projectRepoError" class="error" hidden>Enter a valid-looking GitHub repository URL.</p></div>
+<div class="field"><label for="projectDescription">What is this project? <span class="optional">Optional</span></label><textarea id="projectDescription" rows="4" placeholder="A SaaS application for managing customer subscriptions."></textarea></div>
+<div class="field"><label for="projectDirection">What are you planning to work on? <span class="optional">Optional</span></label><textarea id="projectDirection" rows="4" placeholder="Continue developing the application and add payments, user management, and an admin area."></textarea></div>
+<fieldset class="choice-group"><legend>Current project knowledge <span class="optional">Optional</span></legend><label class="choice"><input type="radio" name="knowledge" value="well" checked><span><strong>I already know the project well</strong></span></label><label class="choice"><input type="radio" name="knowledge" value="basics"><span><strong>I only know the basics</strong></span></label><label class="choice"><input type="radio" name="knowledge" value="little"><span><strong>I know very little about the project</strong></span></label></fieldset>
+<div class="generate-wrap"><button id="prepareProject" class="primary generate">Prepare project for AI coding →</button></div></section>
+<section id="taskView" class="card" hidden><div class="section-heading"><span class="step">02</span><div><h2>Prepare a coding task</h2><p>Create a focused prompt for an AI assistant working on an existing project.</p></div></div>
+<div class="field"><label for="taskRepo">GitHub repository <span class="optional">Optional</span></label><input id="taskRepo" type="url" placeholder="https://github.com/user/project"></div><div class="field"><label for="task">What do you want to do? <span class="required">Required</span></label><textarea id="task" rows="5" placeholder="Add password reset functionality to the existing application."></textarea><p id="taskError" class="error" hidden>Please describe the task.</p></div>
+<div class="field"><label for="projectType">What kind of project is this? <span class="optional">Optional</span></label><select id="projectType"><option value="">Select a project type</option><option>Web application</option><option>Backend / API</option><option>Mobile application</option><option>CLI application</option><option>Desktop application</option><option>Library / package</option><option>Other</option></select></div>
+<fieldset class="choice-group"><legend>What already exists?</legend><label class="choice"><input type="radio" name="contextMode" value="known" checked><span><strong>I know</strong><small>I can describe the relevant existing functionality.</small></span></label><label class="choice"><input type="radio" name="contextMode" value="discover"><span><strong>Help me inspect the project</strong><small>Generate a discovery prompt, then paste the external AI analysis back here.</small></span></label></fieldset>
+<div id="knownWrap" class="field"><label for="existing">Describe what already exists <span class="optional">Optional</span></label><textarea id="existing" rows="4"></textarea></div><div id="discoverWrap" class="discovery" hidden><h3>Understand the project first</h3><p>Copy this prompt into ChatGPT or another AI that can inspect the repository. Do not ask it to make changes yet.</p><textarea id="discoveryPrompt" class="code-area" rows="16" readonly></textarea><div class="actions"><button id="copyDiscovery" class="secondary">Copy discovery prompt</button></div><div class="field"><label for="analysis">Paste the project analysis here</label><textarea id="analysis" rows="8"></textarea></div></div>
+<div class="field"><label for="files">Relevant files if known <span class="optional">Optional</span></label><textarea id="files" rows="4" placeholder="src/auth/login.ts&#10;tests/auth/login.test.ts"></textarea></div>
+<section class="workflow-box"><h3>How should your AI assistant work?</h3><div class="speed-options"><button class="speed" data-speed="fast">Fast<small>Fewer checks and quicker implementation.</small></button><button class="speed active" data-speed="careful">Careful ⭐<small>Understand first, make focused changes, and check the result.</small></button><button class="speed" data-speed="thorough">Thorough<small>Use extra checks for larger or riskier changes.</small></button></div><details><summary>Customize advanced options ▾</summary><div id="advanced" class="checks"></div></details></section>
+<div class="field"><label for="criteria">Acceptance criteria <span class="optional">Optional</span></label><textarea id="criteria" rows="4"></textarea></div><div class="field"><label for="additional">Additional instructions <span class="optional">Optional</span></label><textarea id="additional" rows="4"></textarea></div><div class="generate-wrap"><button id="prepareTask" class="primary generate">Prepare coding task →</button></div></section>
+<section id="resultView" class="result-card" hidden><div class="result-head"><div><span class="eyebrow">READY</span><h2 id="resultTitle">Your prompt is ready</h2><p id="sizeLabel">Approximate token count</p></div><button id="edit" class="ghost">Edit</button></div><textarea id="output" class="code-area result-area" rows="28"></textarea><div class="actions"><button id="copyOutput" class="primary">Copy prompt</button><button id="back" class="secondary">Back</button></div><p id="copyStatus" class="success" hidden>Copied ✓</p><div id="workflowExplain" class="workflow-explain"></div></section>
+<section class="memory card"><h2>What are the project-memory files?</h2><div class="memory-grid"><div><strong>AGENTS.md</strong><span>How the coding assistant should work.</span></div><div><strong>SPEC.md</strong><span>What the project is supposed to do.</span></div><div><strong>PLAN.md</strong><span>What the project should work on next.</span></div><div><strong>PROGRESS.md</strong><span>What has already been completed.</span></div><div><strong>DECISIONS.md</strong><span>Why important technical decisions were made.</span></div><div><strong>LESSONS.md</strong><span>What future coding sessions should remember.</span></div></div></section>
+<div class="storage-row"><button id="clearData" class="text-button">Clear saved data</button><span id="saveStatus" aria-live="polite">Saved locally</span></div></main><footer>ContextOS · offline-first · Open index.html directly from disk</footer><script src="app.js"></script></body></html>
